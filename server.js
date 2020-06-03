@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const logger = require('./middlewares/logger');
+const errorHandle = require('./middlewares/error');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 
@@ -26,6 +27,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/bootcamps', bootcamps);
 
+app.use(errorHandle);
+
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(
@@ -38,5 +41,4 @@ process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
   // close server
   server.close(() => process.exit(1));
-  
 });
