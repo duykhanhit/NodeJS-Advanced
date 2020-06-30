@@ -10,7 +10,6 @@ const {
 
 // Import other resource routers
 const courseRouter = require('./courses');
-const { route } = require('./courses');
 
 const router = express.Router();
 
