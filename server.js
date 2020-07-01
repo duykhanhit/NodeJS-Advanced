@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+const fileupload = require('express-fileupload');
 const dotenv = require('dotenv');
 const logger = require('./middlewares/logger');
 const errorHandle = require('./middlewares/error');
@@ -16,6 +18,12 @@ const app = express();
 
 // Body parser 
 app.use(express.json());
+
+// Upload file
+app.use(fileupload());
+
+// Static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Dev logging middleware
 if(process.env.NODE_ENV === 'development'){
