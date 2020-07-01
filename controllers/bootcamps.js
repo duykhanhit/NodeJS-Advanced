@@ -9,64 +9,7 @@ const ErrorResponse = require('../utils/errorResponse');
 //@access    public
 
 module.exports.getBootCamps = asyncHandle(async (req, res, next) => {
-  let query;
-
-  const reqQuery = { ...req.query };
-
-  const removeFields = ['select', 'sort', 'page', 'limit'];
-  
-  removeFields.forEach(param => delete reqQuery[param]);
-
-  let queryStr = JSON.stringify(reqQuery);
-  queryStr = queryStr.replace(/\b(eq|gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-  query = Bootcamp.find(JSON.parse(queryStr)).populate('courses');
-
-  if(req.query.select) {
-    const fields = req.query.select.split(',').join(' ');
-    
-    query = query.select(fields);
-  }
-
-  if(req.query.sort) {
-    const sortBy = req.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort('-createdAt');
-  }
-
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const startIndex = (page - 1)*limit;
-  const endIndex = page*limit;
-  const total = await Bootcamp.countDocuments();
-
-  query = query.skip(startIndex).limit(limit);
-
-  const bootcamps = await query;
-
-  const pagination = {};
-
-  if(endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit
-    }
-  }
-
-  if(startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit
-    }
-  }
-
-  res.status(200).json({
-    success: true,
-    count: bootcamps.length,
-    pagination,
-    data: bootcamps
-  });
+  res.status(200).json(res.advancedResults);
 });
 
 //@desc      GET bootcamp
@@ -190,7 +133,7 @@ module.exports.bootcampPhotoUpload = asyncHandle(async (req, res, next) => {
   }
 
   if(file.size > process.env.MAX_SIZE_UPLOAD){
-    return next(new ErrorResponse(`Please upload a file with size less than ${process.env.MAX_SIZE_UPLOAD}`, 400));
+    return next(new ErrorResponse(`Please upload a file with size less than ${process.env.MAX_SIZE_UPLOAD/(1024*1024)}MB`, 400));
   }
 
   file.name = `bootcamp_${req.params.id}${path.parse(file.name).ext}`;
