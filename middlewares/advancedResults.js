@@ -1,5 +1,3 @@
-const { populate } = require("../models/Bootcamp");
-
 const advancedResults = (model, populate) => async (req, res, next) => {
   let query;
 

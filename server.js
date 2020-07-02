@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fileupload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const logger = require('./middlewares/logger');
 const errorHandle = require('./middlewares/error');
@@ -19,6 +20,7 @@ const app = express();
 
 // Body parser 
 app.use(express.json());
+app.use(cookieParser());
 
 // Upload file
 app.use(fileupload());
