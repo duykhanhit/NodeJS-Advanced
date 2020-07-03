@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const asyncHandle = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
+const sendMail = require('../utils/sendEmail');
 
 //@desc      Register user
 //@route     POST /api/v1/auth/register
@@ -84,4 +85,52 @@ module.exports.getMe = asyncHandle( async (req, res, next) => {
     success: true,
     data: user
   });
+});
+
+//@desc      Forgot password
+//@route     POST /api/v1/auth/forgotpassword
+//@access    private
+
+module.exports.forgotPassword = asyncHandle( async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email});
+
+  if(!user) {
+    return next(new ErrorResponse(`There is no user with email: ${req.body.email}`, 404));
+  }
+
+  //Get reset token
+  const resetToken = user.getResetPasswordToken();
+  
+  await user.save({
+    validateBeforeSave: false
+  });
+
+  // Create reset url
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
+
+  const message = `Click to ${resetUrl} to reset password`;
+
+  try {
+    await sendMail({
+      email: user.email,
+      subejct: 'Reset password',
+      message
+    });
+
+    res.status(200).json({
+      success: true,
+      data: 'Email sent'
+    });
+  } catch (err) {
+    console.log(err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({
+      validateBeforeSave: false
+    });
+
+    return next(new ErrorResponse(`Email coult not be sent`, 500));
+  }
+
 });
