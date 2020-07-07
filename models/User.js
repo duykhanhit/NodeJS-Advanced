@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Vui Vui lòng nhập mật khẩu.'],
+    required: [true, 'Vui lòng nhập mật khẩu.'],
     minlength: 6,
     select: false
   },
