@@ -15,10 +15,12 @@ const { protect, authorize } = require('../middlewares/auth');
 
 // Import other resource routers
 const courseRouter = require('./courses');
+const reviewRouter = require('./reviews');
 
 const router = express.Router();
 
 router.use('/:bootcampId/courses', courseRouter);
+router.use('/:bootcampId/reviews', reviewRouter);
 
 router.route('/:id/photo')
       .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);

@@ -11,7 +11,7 @@ const errorHandle = (err, req, res, next) => {
 
   // MongoDB bad ObjectID
   if(err.name === 'CastError'){
-    const message = `Bootcamp not found with id of ${err.value}`;
+    const message = `Resource not found with id of ${err.value}`;
     error = new ErrorResponse(message, 404);
   }
 
